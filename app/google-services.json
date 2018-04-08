@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1009563951678",
+    "firebase_url": "https://live-attendance-mpstme.firebaseio.com",
+    "project_id": "live-attendance-mpstme",
+    "storage_bucket": "live-attendance-mpstme.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1009563951678:android:b63749d48d08d041",
+        "android_client_info": {
+          "package_name": "com.example.marmikthakkar.liveattendance"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1009563951678-r36s5p9ek89pbm573ht6s198n5daiuh1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.marmikthakkar.liveattendance",
+            "certificate_hash": "5df4112b5252e78a25fdf522e9130f92f2045cd2"
+          }
+        },
+        {
+          "client_id": "1009563951678-k6q1pmhfhi2ngqtgr478jpeu8gspe2fb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCoWmYZTsOiKFkpQaHIkabH9mcppiR84iw"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1009563951678-k6q1pmhfhi2ngqtgr478jpeu8gspe2fb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
