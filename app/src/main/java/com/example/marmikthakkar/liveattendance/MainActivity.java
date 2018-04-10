@@ -61,13 +61,6 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                                 dashboardIntent = new Intent(MainActivity.this, DashboardActivity.class);
                                 dashboardIntent.putExtra("User", user);
                                 startActivity(dashboardIntent);
-
-//                                if (snapshot.child("type").getValue().equals("student")){
-//                                    Toast.makeText(MainActivity.this, "Welcome "+user.getName(), Toast.LENGTH_SHORT).show();
-//                                }
-//                                if (snapshot.child("type").getValue().equals("faculty")){
-//                                    Toast.makeText(MainActivity.this, "Welcome "+user.getName(), Toast.LENGTH_SHORT).show();
-//                                }
                             }else {
                                 Toast.makeText(MainActivity.this, "Password does not match", Toast.LENGTH_SHORT).show();
                             }
