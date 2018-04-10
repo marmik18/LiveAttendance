@@ -25,6 +25,7 @@ public class DashboardActivity extends AppCompatActivity
     DrawerLayout drawer;
     FloatingActionButton fab;
     User user;
+    StudentAttendanceFragment studentAttendanceFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,14 +34,18 @@ public class DashboardActivity extends AppCompatActivity
 
         user = getIntent().getParcelableExtra("User");
 
+        fab = findViewById(R.id.fab);
+        drawer = findViewById(R.id.drawer_layout);
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        fab = findViewById(R.id.fab);
+        studentAttendanceFragment = new StudentAttendanceFragment();
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("User", user);
+        studentAttendanceFragment.setArguments(bundle);
+        loadFragment(studentAttendanceFragment);
 
-        loadFragment(new StudentAttendanceFragment());
-
-        drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
@@ -53,9 +58,7 @@ public class DashboardActivity extends AppCompatActivity
 
     private void loadFragment(Fragment fragment) {
         FragmentManager fragmentManager = getFragmentManager();
-
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
         fragmentTransaction.replace(R.id.dashboardFrameLayout, fragment);
         fragmentTransaction.commit();
     }
@@ -99,7 +102,7 @@ public class DashboardActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_camera) {
-            loadFragment(new StudentAttendanceFragment());
+            loadFragment(studentAttendanceFragment);
         } else if (id == R.id.nav_gallery) {
             loadFragment(new EditProfileFragment());
         } else if (id == R.id.nav_slideshow) {
