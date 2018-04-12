@@ -2,6 +2,7 @@ package com.example.marmikthakkar.liveattendance;
 
         import android.os.Bundle;
         import android.app.Fragment;
+        import android.provider.ContactsContract;
         import android.util.Log;
         import android.view.LayoutInflater;
         import android.view.View;
@@ -35,7 +36,7 @@ public class StudentAttendanceFragment extends Fragment implements ValueEventLis
         }
         listView = view.findViewById(R.id.listView);
         mDatabaseRef = FirebaseDatabase.getInstance().getReference();
-        Query query = mDatabaseRef.child("courses").child(user.getCourse()).child(user.getProgramme()).child(user.getSem()).orderByChild(user.getUid());
+        Query query = mDatabaseRef.child("courses/"+user.getCourse()+"/"+user.getProgramme()+"/"+user.getSem()).orderByValue();
         query.addListenerForSingleValueEvent(this);
 
         return view;
@@ -46,6 +47,12 @@ public class StudentAttendanceFragment extends Fragment implements ValueEventLis
         if(dataSnapshot.exists()){
             for (DataSnapshot subject: dataSnapshot.getChildren()){
                 Log.d("subject", subject.child("faculty").getValue().toString());
+                if (!subject.child("lab").getValue().toString().equals("false")){
+                    for (DataSnapshot lab: subject.child("lab").getChildren()){
+                        
+                        Log.d("lab_children", lab.getValue().toString());
+                    }
+                }
             }
         }else{
             Toast.makeText(getActivity(), "Data Not Found", Toast.LENGTH_SHORT).show();
