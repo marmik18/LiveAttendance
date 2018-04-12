@@ -24,6 +24,7 @@ public class StudentAttendanceFragment extends Fragment implements ValueEventLis
     User user;
     ListView listView;
     DatabaseReference mDatabaseRef;
+    int maxhours;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         view = inflater.inflate(R.layout.fragment_student_attendance, container, false);
@@ -47,10 +48,14 @@ public class StudentAttendanceFragment extends Fragment implements ValueEventLis
         if(dataSnapshot.exists()){
             for (DataSnapshot subject: dataSnapshot.getChildren()){
                 Log.d("subject", subject.child("faculty").getValue().toString());
-                if (!subject.child("lab").getValue().toString().equals("false")){
-                    for (DataSnapshot lab: subject.child("lab").getChildren()){
-                        
-                        Log.d("lab_children", lab.getValue().toString());
+                if (subject.child("total").exists()){
+                    maxhours = Integer.parseInt(subject.child("total").child("maxhours").getValue().toString());
+                    Log.d("max_hours", subject.getKey().toString());
+//                    Query query = mDatabaseRef.child("courses/"+user.getCourse()+"/"+user.getProgramme()+"/"+user.getSem()+"/"+subject.getKey()+"/attendance").orderByChild(user.getUid()).equalTo(user.getUid());
+                    for (DataSnapshot uid: subject.child("total/attendance").getChildren()){
+                        if (uid.getKey().toString().equals(user.getUid())){
+                            Toast.makeText(getActivity(), uid.getValue().toString(), Toast.LENGTH_SHORT).show();
+                        }
                     }
                 }
             }
