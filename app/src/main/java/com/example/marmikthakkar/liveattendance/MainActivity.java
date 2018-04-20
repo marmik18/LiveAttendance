@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                             User user = snapshot.getValue(User.class);
                             if (snapshot.child("pass").getValue().equals(password)){
                                 dashboardIntent = new Intent(MainActivity.this, DashboardActivity.class);
-                                dashboardIntent.putExtra("User", user);
+                                dashboardIntent.putExtra("user", user);
                                 startActivity(dashboardIntent);
                             }else {
                                 Toast.makeText(MainActivity.this, "Password does not match", Toast.LENGTH_SHORT).show();

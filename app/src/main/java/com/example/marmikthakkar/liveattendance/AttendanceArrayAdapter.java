@@ -2,12 +2,18 @@ package com.example.marmikthakkar.liveattendance;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import java.io.InputStream;
+import java.net.URL;
 
 public class AttendanceArrayAdapter extends ArrayAdapter<Attendance>{
     Context context;
@@ -45,10 +51,11 @@ public class AttendanceArrayAdapter extends ArrayAdapter<Attendance>{
         }
 
         Attendance attendance = data[position];
-        holder.subjectNameTextView.setText(attendance.subjectName);
-        holder.facultyNameTextView.setText(attendance.facultyName);
-        holder.percentTextView.setText(String.valueOf(attendance.attendancePercent)+"%");
-        holder.imgIcon.setImageResource(attendance.icon);
+        holder.subjectNameTextView.setText(attendance.getSubjectName());
+        holder.facultyNameTextView.setText(attendance.getFacultyName());
+        holder.percentTextView.setText(String.valueOf(attendance.getAttendancePercent())+"%");
+        new DownLoadImageTask(holder.imgIcon).execute(attendance.getIcon());
+//        holder.imgIcon.setImageResource(attendance.getIcon());
 
         return row;
     }
@@ -61,4 +68,41 @@ public class AttendanceArrayAdapter extends ArrayAdapter<Attendance>{
         TextView percentTextView;
     }
 }
+
+class DownLoadImageTask extends AsyncTask<String,Void,Bitmap> {
+    ImageView imageView;
+
+    public DownLoadImageTask(ImageView imageView){
+        this.imageView = imageView;
+    }
+
+    /*
+        doInBackground(Params... params)
+            Override this method to perform a computation on a background thread.
+     */
+    protected Bitmap doInBackground(String...urls){
+        String urlOfImage = urls[0];
+        Bitmap logo = null;
+        try{
+            InputStream is = new URL(urlOfImage).openStream();
+                /*
+                    decodeStream(InputStream is)
+                        Decode an input stream into a bitmap.
+                 */
+            logo = BitmapFactory.decodeStream(is);
+        }catch(Exception e){ // Catch the download exception
+            e.printStackTrace();
+        }
+        return logo;
+    }
+
+    /*
+        onPostExecute(Result result)
+            Runs on the UI thread after doInBackground(Params...).
+     */
+    protected void onPostExecute(Bitmap result){
+        imageView.setImageBitmap(result);
+    }
+}
+
 

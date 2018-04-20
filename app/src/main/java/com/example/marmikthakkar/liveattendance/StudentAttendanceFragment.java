@@ -11,6 +11,7 @@ package com.example.marmikthakkar.liveattendance;
         import android.widget.TextView;
         import android.widget.Toast;
 
+        import com.google.firebase.database.ChildEventListener;
         import com.google.firebase.database.DataSnapshot;
         import com.google.firebase.database.DatabaseError;
         import com.google.firebase.database.DatabaseReference;
@@ -29,14 +30,15 @@ public class StudentAttendanceFragment extends Fragment{
     ListView listView;
     TextView textView;
     DatabaseReference mDatabaseRef;
-    ArrayList<Integer> maxHoursPerSubject;
-    ArrayList<Integer> attended;
+    Subject subject[];
+    Attendance attendance[];
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         view = inflater.inflate(R.layout.fragment_student_attendance, container, false);
 
-        if ( getArguments().getParcelable("User") != null ){
-            user = getArguments().getParcelable("User");
+        if ( getArguments().getParcelable("user") != null ){
+            user = getArguments().getParcelable("user");
+            subject = (Subject[]) getArguments().getParcelableArray("subjects");
         }else {
             Toast.makeText(getActivity(), "Invalid Login", Toast.LENGTH_SHORT).show();
             getActivity().finish();
@@ -44,62 +46,40 @@ public class StudentAttendanceFragment extends Fragment{
         textView = view.findViewById(R.id.testTextView);
         listView = view.findViewById(R.id.listView);
         mDatabaseRef = FirebaseDatabase.getInstance().getReference();
-        Query subjectQuery = mDatabaseRef.child("courses/"+user.getCourse()+"/"+user.getProgramme()+"/"+user.getSem()+"/subjects");
-        subjectQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists()){
-                    maxHoursPerSubject = new ArrayList<>();
-                    attended = new ArrayList<>();
-
-                    for (DataSnapshot subject: dataSnapshot.getChildren()){
-                        Log.d("subject", subject.getValue().toString());
-                        Query attendance = mDatabaseRef.child("courses/"+user.getCourse()+"/"+user.getProgramme()+"/"+user.getSem()+"/"+subject.getValue().toString()+"/total/attendance/").orderByKey().equalTo(user.getUid());
-                        attendance.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                attended.add(Integer.parseInt(dataSnapshot.child(user.getUid()).getValue().toString()));
-                                Log.d("attendance", dataSnapshot.child(user.getUid()).getValue().toString());
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        });
-
-                        Query maxhours = mDatabaseRef.child("courses/"+user.getCourse()+"/"+user.getProgramme()+"/"+user.getSem()+"/"+subject.getValue().toString()+"/total/maxhours");
-                        maxhours.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                maxHoursPerSubject.add(Integer.parseInt(dataSnapshot.getValue().toString()));
-                                textView.setText("");
-                                for (int i=0; i<attended.size();i++){
-                                    textView.append(attended.get(i).toString()+"\t"+maxHoursPerSubject.get(i).toString());
-                                    textView.append("\n");
-                                }
-                                Log.d("maxhours", dataSnapshot.getValue().toString());
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        });
-                    }
-                }else{
-                    Toast.makeText(getActivity(), "Data Not Found", Toast.LENGTH_SHORT).show();
+        attendance = new Attendance[subject.length];
+        for (int i = 0; i < subject.length ; i++){
+            Query attendanceQuery = mDatabaseRef.child("courses/"+user.getCourse()+"/"+user.getProgramme()+"/"+user.getSem()+"/"+subject[i].getName()+"/total/attendance/").orderByKey().equalTo(user.getUid());
+            final int finalI = i;
+            attendanceQuery.addChildEventListener(new ChildEventListener() {
+                @Override
+                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                    attendance[finalI] = new Attendance(subject[finalI].getImgURL(),subject[finalI].getName(),subject[finalI].getFaculty(), Integer.parseInt(dataSnapshot.getValue().toString()));
+                    AttendanceArrayAdapter attendanceArrayAdapter = new AttendanceArrayAdapter(getActivity(), R.layout.custom_layout_attendance, attendance);
+                    listView.setAdapter(attendanceArrayAdapter);
                 }
-            }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
+                @Override
+                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                }
 
-            }
-        });
+                @Override
+                public void onChildRemoved(DataSnapshot dataSnapshot) {
 
-//        Toast.makeText(getActivity(), maxHoursPerSubject.toArray().toString(), Toast.LENGTH_SHORT).show();
-//        Toast.makeText(getActivity(), attended.toArray().toString(), Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
+        }
+
         return view;
     }
 }

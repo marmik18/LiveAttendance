@@ -4,8 +4,11 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Parcelable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -19,6 +22,17 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+
 public class DashboardActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
 
@@ -26,25 +40,64 @@ public class DashboardActivity extends AppCompatActivity
     FloatingActionButton fab;
     User user;
     StudentAttendanceFragment studentAttendanceFragment;
+    DatabaseReference mDatabaseRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
 
-        user = getIntent().getParcelableExtra("User");
-
+        user = getIntent().getParcelableExtra("user");
         fab = findViewById(R.id.fab);
         drawer = findViewById(R.id.drawer_layout);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        mDatabaseRef = FirebaseDatabase.getInstance().getReference();
+        mDatabaseRef.keepSynced(true);
 
-        studentAttendanceFragment = new StudentAttendanceFragment();
-        Bundle bundle = new Bundle();
-        bundle.putParcelable("User", user);
-        studentAttendanceFragment.setArguments(bundle);
-        loadFragment(studentAttendanceFragment);
+
+        if (user.getType().equals("student")){
+            final Query subjectQuery = mDatabaseRef.child("courses/"+user.getCourse()+"/"+user.getProgramme()+"/"+user.getSem()+"/subjects").orderByKey();
+            subjectQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if(dataSnapshot.exists()){
+                        Subject subject[]= new Subject[(int)dataSnapshot.getChildrenCount()];
+                        int i = 0;
+                        for (DataSnapshot subjectSnapShot: dataSnapshot.getChildren()){
+                            Log.d("subjects", String.valueOf(subjectSnapShot.getValue().toString()));
+                            subject[i] = new Subject();
+                            subject[i] = subjectSnapShot.getValue(Subject.class);
+//                            subject.add(subjectSnapShot.getValue().toString());
+                            Log.d("subject_class","sub["+i+"] : "+subject[i].getName());
+                            i++;
+                        }
+
+                        studentAttendanceFragment = new StudentAttendanceFragment();
+                        Bundle bundle = new Bundle();
+                        bundle.putParcelableArray("subjects", subject);
+                        bundle.putParcelable("user", user);
+                        studentAttendanceFragment.setArguments(bundle);
+                        loadFragment(studentAttendanceFragment);
+
+                    }else{
+                        Toast.makeText(DashboardActivity.this, "Data Not Found", Toast.LENGTH_SHORT).show();
+                    }
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }else if (user.getType().equals("faculty")){
+            loadFragment(new EditProfileFragment());
+        }
+//        Toast.makeText(this, String.valueOf(sub.length), Toast.LENGTH_SHORT).show();
+
+
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
