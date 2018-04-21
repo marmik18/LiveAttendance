@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/addUserConstraintLayout"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.marmikthakkar.liveattendance.AddUserActivity">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="34dp"
+        android:layout_marginTop="8dp"
+        android:text="Add a User"
+        android:textAlignment="center"
+        android:textSize="25dp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="0dp" />
+
+    <ScrollView
+        android:id="@+id/scrollView2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:id="@+id/addUserLinearLayour"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/addUserUid"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Username / SAP ID" />
+
+            <EditText
+                android:id="@+id/addUserPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Password" />
+
+            <Spinner
+                android:id="@+id/addUserSpinner"
+                style="text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:entries="@array/userType"></Spinner>
+
+            <EditText
+                android:id="@+id/addUserName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Name" />
+        </LinearLayout>
+
+    </ScrollView>
+
+    <Button
+        android:id="@+id/addUserCreateUser"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:text="create user"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/scrollView2" />
+
+</android.support.constraint.ConstraintLayout>

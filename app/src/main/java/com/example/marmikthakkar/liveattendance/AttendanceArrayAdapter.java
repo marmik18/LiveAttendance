@@ -12,7 +12,13 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
+import com.squareup.picasso.Picasso;
+
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 public class AttendanceArrayAdapter extends ArrayAdapter<Attendance>{
@@ -28,7 +34,7 @@ public class AttendanceArrayAdapter extends ArrayAdapter<Attendance>{
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         View row = convertView;
         AttendanceHolder holder = null;
 
@@ -54,9 +60,25 @@ public class AttendanceArrayAdapter extends ArrayAdapter<Attendance>{
         holder.subjectNameTextView.setText(attendance.getSubjectName());
         holder.facultyNameTextView.setText(attendance.getFacultyName());
         holder.percentTextView.setText(String.valueOf(attendance.getAttendancePercent())+"%");
-        new DownLoadImageTask(holder.imgIcon).execute(attendance.getIcon());
-//        holder.imgIcon.setImageResource(attendance.getIcon());
+        final AttendanceHolder finalHolder = holder;
+        Picasso.get()
+                .load(getItem(position).getIcon())
+                .networkPolicy(NetworkPolicy.OFFLINE)
+                .into(holder.imgIcon, new Callback() {
+                    @Override
+                    public void onSuccess() {
 
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        Picasso.get()
+                                .load(getItem(position).getIcon())
+                                .placeholder(R.drawable.ic_launcher_foreground)
+                                .error(R.drawable.ic_launcher_background)
+                                .into(finalHolder.imgIcon);
+                    }
+                });
         return row;
     }
 
@@ -69,40 +91,5 @@ public class AttendanceArrayAdapter extends ArrayAdapter<Attendance>{
     }
 }
 
-class DownLoadImageTask extends AsyncTask<String,Void,Bitmap> {
-    ImageView imageView;
-
-    public DownLoadImageTask(ImageView imageView){
-        this.imageView = imageView;
-    }
-
-    /*
-        doInBackground(Params... params)
-            Override this method to perform a computation on a background thread.
-     */
-    protected Bitmap doInBackground(String...urls){
-        String urlOfImage = urls[0];
-        Bitmap logo = null;
-        try{
-            InputStream is = new URL(urlOfImage).openStream();
-                /*
-                    decodeStream(InputStream is)
-                        Decode an input stream into a bitmap.
-                 */
-            logo = BitmapFactory.decodeStream(is);
-        }catch(Exception e){ // Catch the download exception
-            e.printStackTrace();
-        }
-        return logo;
-    }
-
-    /*
-        onPostExecute(Result result)
-            Runs on the UI thread after doInBackground(Params...).
-     */
-    protected void onPostExecute(Bitmap result){
-        imageView.setImageBitmap(result);
-    }
-}
 
 

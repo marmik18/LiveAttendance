@@ -34,13 +34,14 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class DashboardActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
+        implements NavigationView.OnNavigationItemSelectedListener {
 
     DrawerLayout drawer;
-    FloatingActionButton fab;
     User user;
     StudentAttendanceFragment studentAttendanceFragment;
     DatabaseReference mDatabaseRef;
+    AdminMainFragment adminMainFragment;
+    Bundle bundle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +49,6 @@ public class DashboardActivity extends AppCompatActivity
         setContentView(R.layout.activity_dashboard);
 
         user = getIntent().getParcelableExtra("user");
-        fab = findViewById(R.id.fab);
         drawer = findViewById(R.id.drawer_layout);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -56,6 +56,8 @@ public class DashboardActivity extends AppCompatActivity
         mDatabaseRef = FirebaseDatabase.getInstance().getReference();
         mDatabaseRef.keepSynced(true);
 
+        bundle = new Bundle();
+        bundle.putParcelable("user", user);
 
         if (user.getType().equals("student")){
             final Query subjectQuery = mDatabaseRef.child("courses/"+user.getCourse()+"/"+user.getProgramme()+"/"+user.getSem()+"/subjects").orderByKey();
@@ -75,9 +77,8 @@ public class DashboardActivity extends AppCompatActivity
                         }
 
                         studentAttendanceFragment = new StudentAttendanceFragment();
-                        Bundle bundle = new Bundle();
                         bundle.putParcelableArray("subjects", subject);
-                        bundle.putParcelable("user", user);
+
                         studentAttendanceFragment.setArguments(bundle);
                         loadFragment(studentAttendanceFragment);
 
@@ -93,11 +94,15 @@ public class DashboardActivity extends AppCompatActivity
                 }
             });
         }else if (user.getType().equals("faculty")){
+//            Change the fragment to home of faculty
+//            studentAttendanceFragment = new StudentAttendanceFragment();
+//            studentAttendanceFragment.setArguments(bundle);
             loadFragment(new EditProfileFragment());
+        }else if (user.getType().equals("admin")){
+            adminMainFragment = new AdminMainFragment();
+            adminMainFragment.setArguments(bundle);
+            loadFragment(adminMainFragment);
         }
-//        Toast.makeText(this, String.valueOf(sub.length), Toast.LENGTH_SHORT).show();
-
-
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -106,7 +111,6 @@ public class DashboardActivity extends AppCompatActivity
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        fab.setOnClickListener(this);
     }
 
     private void loadFragment(Fragment fragment) {
@@ -154,15 +158,17 @@ public class DashboardActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            loadFragment(studentAttendanceFragment);
-        } else if (id == R.id.nav_gallery) {
-            loadFragment(new EditProfileFragment());
-        } else if (id == R.id.nav_slideshow) {
-
+        if (id == R.id.nav_home) {
+            if (user.getType().equals("student")){
+                loadFragment(studentAttendanceFragment);
+            }else if (user.getType().equals("faculty")){
+//                load a different fragment here
+            }else if (user.getType().equals("admin")){
+                loadFragment(adminMainFragment);
+            }
         } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
+            loadFragment(new EditProfileFragment());
+        }else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {
 
@@ -173,11 +179,4 @@ public class DashboardActivity extends AppCompatActivity
         return true;
     }
 
-    @Override
-    public void onClick(View view) {
-        if (view == fab){
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show();
-        }
-    }
 }

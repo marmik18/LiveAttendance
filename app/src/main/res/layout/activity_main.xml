@@ -6,36 +6,41 @@
     android:layout_height="match_parent"
     tools:context="com.example.marmikthakkar.liveattendance.MainActivity">
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp"
-        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <EditText
-            android:text="70011016100"
-            android:id="@+id/uid"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Username" />
+            android:orientation="vertical">
 
-        <EditText
-            android:text="70011016100"
-            android:id="@+id/password"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textPassword"
-            android:hint="Password" />
+            <EditText
+                android:id="@+id/uid"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Username"
+                android:text="admin" />
 
-        <Button
-            android:id="@+id/loginButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Login" />
+            <EditText
+                android:id="@+id/password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Password"
+                android:inputType="textPassword"
+                android:text="admin" />
 
-    </LinearLayout>
+            <Button
+                android:id="@+id/loginButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Login" />
+
+        </LinearLayout>
+    </ScrollView>
 
 </android.support.constraint.ConstraintLayout>

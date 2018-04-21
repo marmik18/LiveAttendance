@@ -5,6 +5,9 @@ import android.os.Parcelable;
 
 import com.google.firebase.database.IgnoreExtraProperties;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @IgnoreExtraProperties
 public class User implements Parcelable{
     private String uid;

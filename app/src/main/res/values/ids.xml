@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="courseSpinner" type="id" />
+    <item name="programmeSpinner" type="id" />
+    <item name="semSpinner" type="id" />
+</resources>
