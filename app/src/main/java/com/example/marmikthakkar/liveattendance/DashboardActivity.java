@@ -19,6 +19,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,6 +30,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
+import com.squareup.picasso.Picasso;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -42,6 +46,9 @@ public class DashboardActivity extends AppCompatActivity
     DatabaseReference mDatabaseRef;
     AdminMainFragment adminMainFragment;
     Bundle bundle;
+    TextView sapIDTextView, fullNameTextView;
+    ImageView userImageView;
+    NavigationView navigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,8 +63,36 @@ public class DashboardActivity extends AppCompatActivity
         mDatabaseRef = FirebaseDatabase.getInstance().getReference();
         mDatabaseRef.keepSynced(true);
 
+        navigationView = findViewById(R.id.nav_view);
+        fullNameTextView = navigationView.getHeaderView(0).findViewById(R.id.fullNameTextView);
+        sapIDTextView = navigationView.getHeaderView(0).findViewById(R.id.sapIDTextView);
+        userImageView = navigationView.getHeaderView(0).findViewById(R.id.imageView);
+
         bundle = new Bundle();
         bundle.putParcelable("user", user);
+
+        fullNameTextView.setText(user.getName());
+        sapIDTextView.setText(user.getUid());
+        Log.d("SSS", user.getImgURL());
+        Picasso.get()
+                .load(user.getImgURL())
+                .networkPolicy(NetworkPolicy.OFFLINE)
+                .into(userImageView, new Callback() {
+                    @Override
+                    public void onSuccess() {
+
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        Picasso.get()
+                                .load(user.getImgURL())
+                                .placeholder(R.drawable.ic_launcher_foreground)
+                                .error(R.drawable.ic_launcher_background)
+                                .into(userImageView);
+                    }
+                });
+
 
         if (user.getType().equals("student")){
             final Query subjectQuery = mDatabaseRef.child("courses/"+user.getCourse()+"/"+user.getProgramme()+"/"+user.getSem()+"/subjects").orderByKey();
@@ -68,10 +103,9 @@ public class DashboardActivity extends AppCompatActivity
                         Subject subject[]= new Subject[(int)dataSnapshot.getChildrenCount()];
                         int i = 0;
                         for (DataSnapshot subjectSnapShot: dataSnapshot.getChildren()){
-                            Log.d("subjects", String.valueOf(subjectSnapShot.getValue().toString()));
+                            Log.d("subjects", subjectSnapShot.getValue().toString());
                             subject[i] = new Subject();
                             subject[i] = subjectSnapShot.getValue(Subject.class);
-//                            subject.add(subjectSnapShot.getValue().toString());
                             Log.d("subject_class","sub["+i+"] : "+subject[i].getName());
                             i++;
                         }

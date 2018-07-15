@@ -17,12 +17,13 @@ public class User implements Parcelable{
     private String course;
     private String programme;
     private String sem;
+    private String imgURL;
 
     public User(){
 
     }
 
-    public User(String uid, String pass, String type, String name, String course, String programme, String sem){
+    public User(String uid, String pass, String type, String name, String course, String programme, String sem, String imgURL){
         this.uid = uid;
         this.pass = pass;
         this.type = type;
@@ -30,10 +31,11 @@ public class User implements Parcelable{
         this.course = course;
         this.programme = programme;
         this.sem = sem;
+        this.imgURL = imgURL;
     }
 
     public User(Parcel in){
-        String[] data= new String[7];
+        String[] data= new String[8];
 
         in.readStringArray(data);
         this.uid = data[0];
@@ -43,6 +45,7 @@ public class User implements Parcelable{
         this.course = data[4];
         this.programme = data[5];
         this.sem = data[6];
+        this.imgURL = data[7];
     }
 
     public String getUid() {
@@ -73,6 +76,10 @@ public class User implements Parcelable{
         return programme;
     }
 
+    public String getImgURL() {
+        return imgURL;
+    }
+
     public void setPass(String pass) {
         this.pass = pass;
     }
@@ -101,6 +108,10 @@ public class User implements Parcelable{
         this.sem = sem;
     }
 
+    public void setImgURL(String imgURL) {
+        this.imgURL = imgURL;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -108,7 +119,7 @@ public class User implements Parcelable{
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeStringArray(new String[]{this.uid, this.pass, this.type, this.name, this.course, this.programme, this.sem});
+        dest.writeStringArray(new String[]{this.uid, this.pass, this.type, this.name, this.course, this.programme, this.sem, this.imgURL});
     }
 
     public static final Parcelable.Creator<User> CREATOR= new Parcelable.Creator<User>() {

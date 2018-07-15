@@ -24,7 +24,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Username"
-                android:text="admin" />
+                android:text="70011016100" />
 
             <EditText
                 android:id="@+id/password"
@@ -32,7 +32,7 @@
                 android:layout_height="wrap_content"
                 android:hint="Password"
                 android:inputType="textPassword"
-                android:text="admin" />
+                android:text="70011016100" />
 
             <Button
                 android:id="@+id/loginButton"

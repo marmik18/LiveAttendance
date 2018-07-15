@@ -5,21 +5,21 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.os.Build;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
+import com.example.marmikthakkar.liveattendance.animation.*;
 
 public class AttendanceArrayAdapter extends ArrayAdapter<Attendance>{
     Context context;
@@ -48,6 +48,8 @@ public class AttendanceArrayAdapter extends ArrayAdapter<Attendance>{
             holder.facultyNameTextView = row.findViewById(R.id.facultyName);
             holder.subjectNameTextView = row.findViewById(R.id.subjectName);
             holder.percentTextView = row.findViewById(R.id.attendancePercent);
+            holder.progressBar = row.findViewById(R.id.horizontal_progress_bar);
+            holder.lectureCount = row.findViewById(R.id.lectureCount);
 
             row.setTag(holder);
         }
@@ -57,10 +59,22 @@ public class AttendanceArrayAdapter extends ArrayAdapter<Attendance>{
         }
 
         Attendance attendance = data[position];
+        final AttendanceHolder finalHolder = holder;
+
         holder.subjectNameTextView.setText(attendance.getSubjectName());
         holder.facultyNameTextView.setText(attendance.getFacultyName());
         holder.percentTextView.setText(String.valueOf(attendance.getAttendancePercent())+"%");
-        final AttendanceHolder finalHolder = holder;
+        holder.progressBar.setMax(attendance.getHoursOccurred());
+//        ProgressBarAnimation anim = new ProgressBarAnimation(holder.progressBar, 0, attendance.getHoursAttended());
+//        anim.setDuration(1000);
+//        holder.progressBar.startAnimation(anim);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            holder.progressBar.setProgress(attendance.getHoursAttended(), true);
+        }
+        holder.lectureCount.setText(attendance.getHoursAttended()+"/"+attendance.getHoursOccurred());
+
+
+
         Picasso.get()
                 .load(getItem(position).getIcon())
                 .networkPolicy(NetworkPolicy.OFFLINE)
@@ -88,6 +102,8 @@ public class AttendanceArrayAdapter extends ArrayAdapter<Attendance>{
         TextView subjectNameTextView;
         TextView facultyNameTextView;
         TextView percentTextView;
+        TextView lectureCount;
+        ProgressBar progressBar;
     }
 }
 
