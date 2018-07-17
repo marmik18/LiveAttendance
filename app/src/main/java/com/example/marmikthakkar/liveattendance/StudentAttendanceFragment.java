@@ -3,6 +3,7 @@ package com.example.marmikthakkar.liveattendance;
         import android.os.Bundle;
         import android.app.Fragment;
         import android.provider.ContactsContract;
+        import android.support.v4.widget.SwipeRefreshLayout;
         import android.util.Log;
         import android.view.LayoutInflater;
         import android.view.View;
@@ -26,10 +27,10 @@ package com.example.marmikthakkar.liveattendance;
 
 public class StudentAttendanceFragment extends Fragment{
 
+    SwipeRefreshLayout mSwipeRefreshLayout;
     View view;
     User user;
     ListView listView;
-    TextView textView;
     DatabaseReference mDatabaseRef;
     Subject subject[];
     Attendance attendance[];
@@ -45,13 +46,15 @@ public class StudentAttendanceFragment extends Fragment{
             Toast.makeText(getActivity(), "Invalid Login", Toast.LENGTH_SHORT).show();
             getActivity().finish();
         }
+        mSwipeRefreshLayout = view.findViewById(R.id.studentAttendanceLayout);
         listView = view.findViewById(R.id.listView);
         mDatabaseRef = FirebaseDatabase.getInstance().getReference();
+
         attendance = new Attendance[subject.length];
         for (int i = 0; i < subject.length ; i++){
             Query attendanceQuery = mDatabaseRef.child("courses/"+user.getCourse()+"/"+user.getProgramme()+"/"+user.getSem()+"/"+subject[i].getName()+"/total").orderByKey();
             final int finalI = i;
-            attendanceQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            attendanceQuery.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     if (dataSnapshot.exists()){
@@ -61,7 +64,7 @@ public class StudentAttendanceFragment extends Fragment{
                         int maxHours = Integer.parseInt(dataSnapshot.child("maxhours").getValue().toString());
                         double percentAttendedHours = ( (float) attendedHours / maxHours ) * 100;
 
-//                          For Float number format
+//                        For formatting percent to min 1 and max 2 decimal place
                         NumberFormat numberFormat = NumberFormat.getNumberInstance();
                         numberFormat.setMinimumIntegerDigits(1);
                         numberFormat.setMaximumFractionDigits(2);
@@ -86,7 +89,54 @@ public class StudentAttendanceFragment extends Fragment{
             });
 
         }
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshList();
+                mSwipeRefreshLayout.setRefreshing(false);
+            }
+        });
 
         return view;
+    }
+
+    public void refreshList(){
+        attendance = new Attendance[subject.length];
+        for (int i = 0; i < subject.length ; i++){
+            Query attendanceQuery = mDatabaseRef.child("courses/"+user.getCourse()+"/"+user.getProgramme()+"/"+user.getSem()+"/"+subject[i].getName()+"/total").orderByKey();
+            final int finalI = i;
+            attendanceQuery.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()){
+                        int attendedHours = Integer.parseInt(dataSnapshot.child("attendance/"+user.getUid()).getValue().toString());
+                        int maxHours = Integer.parseInt(dataSnapshot.child("maxhours").getValue().toString());
+                        double percentAttendedHours = ( (float) attendedHours / maxHours ) * 100;
+
+//                        For formatting percent to min 1 and max 2 decimal place
+                        NumberFormat numberFormat = NumberFormat.getNumberInstance();
+                        numberFormat.setMinimumIntegerDigits(1);
+                        numberFormat.setMaximumFractionDigits(2);
+
+                        attendance[finalI] = new Attendance(
+                                subject[finalI].getImgURL(),
+                                subject[finalI].getName(),
+                                subject[finalI].getFaculty(),
+                                Float.parseFloat(numberFormat.format(percentAttendedHours)),
+                                attendedHours,
+                                maxHours
+                        );
+                        AttendanceArrayAdapter attendanceArrayAdapter = new AttendanceArrayAdapter(getActivity(), R.layout.custom_layout_attendance, attendance);
+                        listView.setAdapter(attendanceArrayAdapter);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
+        }
     }
 }

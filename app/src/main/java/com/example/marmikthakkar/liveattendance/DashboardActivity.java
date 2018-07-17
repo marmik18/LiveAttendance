@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.Parcelable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -45,6 +46,7 @@ public class DashboardActivity extends AppCompatActivity
     StudentAttendanceFragment studentAttendanceFragment;
     DatabaseReference mDatabaseRef;
     AdminMainFragment adminMainFragment;
+    EditProfileFragment editProfileFragment;
     Bundle bundle;
     TextView sapIDTextView, fullNameTextView;
     ImageView userImageView;
@@ -64,16 +66,16 @@ public class DashboardActivity extends AppCompatActivity
         mDatabaseRef.keepSynced(true);
 
         navigationView = findViewById(R.id.nav_view);
-        fullNameTextView = navigationView.getHeaderView(0).findViewById(R.id.fullNameTextView);
-        sapIDTextView = navigationView.getHeaderView(0).findViewById(R.id.sapIDTextView);
-        userImageView = navigationView.getHeaderView(0).findViewById(R.id.imageView);
+        fullNameTextView = navigationView.getHeaderView(0).findViewById(R.id.fullNameTextViewNavHeader);
+        sapIDTextView = navigationView.getHeaderView(0).findViewById(R.id.sapIDTextViewNavHeader);
+        userImageView = navigationView.getHeaderView(0).findViewById(R.id.imageViewNavHeader);
+
 
         bundle = new Bundle();
         bundle.putParcelable("user", user);
 
         fullNameTextView.setText(user.getName());
         sapIDTextView.setText(user.getUid());
-        Log.d("SSS", user.getImgURL());
         Picasso.get()
                 .load(user.getImgURL())
                 .networkPolicy(NetworkPolicy.OFFLINE)
@@ -147,13 +149,6 @@ public class DashboardActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
     }
 
-    private void loadFragment(Fragment fragment) {
-        FragmentManager fragmentManager = getFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.dashboardFrameLayout, fragment);
-        fragmentTransaction.commit();
-    }
-
     @Override
     public void onBackPressed() {
         drawer = findViewById(R.id.drawer_layout);
@@ -201,7 +196,9 @@ public class DashboardActivity extends AppCompatActivity
                 loadFragment(adminMainFragment);
             }
         } else if (id == R.id.nav_manage) {
-            loadFragment(new EditProfileFragment());
+            editProfileFragment = new EditProfileFragment();
+            editProfileFragment.setArguments(bundle);
+            loadFragment(editProfileFragment);
         }else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {
@@ -212,5 +209,14 @@ public class DashboardActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+
+    private void loadFragment(Fragment fragment) {
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.dashboardFrameLayout, fragment);
+        fragmentTransaction.commit();
+    }
+
 
 }
